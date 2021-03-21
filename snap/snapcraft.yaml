@@ -62,7 +62,7 @@ parts:
     plugin: nil
     after: [desktop-gtk2]
     stage-snaps:
-      - mp3gain/latest/edge
+      - mp3gain
     stage:
       - usr/bin/mp3gain
       - usr/lib/x86_64-linux-gnu/*
