@@ -1,0 +1,87 @@
+name: easymp3gain # you probably want to 'snapcraft register <name>'
+base: core20 # the base snap is the execution environment for this snap
+version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
+summary: Single-line elevator pitch for your amazing snap # 79 char long summary
+description: |
+  This is my-snap's description. You have a paragraph or two to tell the
+  most important story about your snap. Keep it under 100 words though,
+  we live in tweetspace and your description wants to look good in the snap
+  store.
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+apps:
+  easymp3gain:
+    command: usr/bin/easymp3gain-gtk
+    plugs:
+    - desktop
+    - desktop-legacy
+    - wayland
+    - x11
+    - home
+plugs:
+  gtk-2-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+
+parts:
+  easymp3gain:
+    plugin: cmake
+    source: https://svn.code.sf.net/p/easymp3gain/code/trunk
+    source-type: svn
+    override-build: |
+      cp -R ../src/* .
+      rm -rf build && mkdir build && cd build; cmake .. -DLAZBUILD_EXE=/usr/bin/lazbuild -DLCL_VERSION=10008 && make
+      make install
+    build-packages:
+      - gcc
+      - g++
+      - libmpg123-dev
+      - lcl
+      - fpc
+      - lcl-gtk2
+      - libgtk2.0-dev
+      - pkg-config
+      - cmake
+      - gettext
+    stage-packages:
+      - libatk1.0-0
+      - libcairo2
+      - libdatrie1
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libgdk-pixbuf2.0-0
+      - libgraphite2-3
+      - libgtk2.0-0
+      - libharfbuzz0b
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libthai0
+      - libx11-6
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxcomposite1
+      - libxcursor1
+      - libxdamage1
+      - libxdmcp6
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxrandr2
+      - libxrender1
+      - locales
+    organize:
+      /usr/bin/easymp3gain-gtk: /usr/bin/easymp3gain-gtk
