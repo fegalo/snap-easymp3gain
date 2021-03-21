@@ -1,7 +1,7 @@
 name: easymp3gain
 base: core20
 version: '0.1' # 0.5.1+svn137
-summary: GUI for MP3Gain # 79 char long summary
+summary: GUI for MP3Gain
 description: |
   Graphical User Interface (GUI) for MP3Gain, VorbisGain and AACGain (enables
   you to modify the loudness level of mp3,ogg,mp4 files) / Frontend for
@@ -12,31 +12,76 @@ confinement: devmode # use 'strict' once you have the right plugs and slots
 
 apps:
   easymp3gain:
-    command: usr/bin/easymp3gain-gtk
+    command: bin/desktop-launch easymp3gain-gtk
     plugs:
-    - desktop
-    - desktop-legacy
-    - wayland
-    - x11
-    - home
+      - avahi-observe
+      - desktop
+      - desktop-legacy
+      - gsettings
+      - home
+      - network
+      - mount-observe
+      - removable-media
+      - x11
+
 plugs:
+  gtk-2-engines:
+    interface: content
+    target: $SNAP/lib/gtk-2.0
+    default-provider: gtk2-common-themes
   gtk-2-themes:
     interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
+    target: $SNAP/share/themes
+    default-provider: gtk2-common-themes
   icon-themes:
     interface: content
-    target: $SNAP/data-dir/icons
+    target: $SNAP/share/icons
     default-provider: gtk-common-themes
 
 parts:
+  desktop-gtk2:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk2"]
+    build-packages:
+      - libgtk2.0-dev
+    stage-packages:
+      - libxkbcommon0  # XKB_CONFIG_ROOT
+      - shared-mime-info
+      - libgtk2.0-0
+      - libgdk-pixbuf2.0-0
+      - libglib2.0-bin
+      - libgtk2.0-bin
+      - unity-gtk2-module
+      - locales-all
+      - libappindicator1
+      - xdg-user-dirs
+  mp3gain:
+    plugin: nil
+    after: [desktop-gtk2]
+    stage-snaps:
+      - mp3gain/latest/edge
+    stage:
+      - usr/bin/mp3gain
+      - usr/lib/x86_64-linux-gnu/*
+    override-build: |
+      mkdir -p ../install/usr/bin/
+      cp ../install/mp3gain ../install/usr/bin/
+      snapcraftctl build
   easymp3gain:
+    after: [mp3gain]
     plugin: cmake
     source: https://svn.code.sf.net/p/easymp3gain/code/trunk
     source-type: svn
     override-build: |
+      rm -rf ./*
       cp -R ../src/* .
-      rm -rf build && mkdir build && cd build; cmake .. -DLAZBUILD_EXE=/usr/bin/lazbuild -DLCL_VERSION=10008 && make
+      rm -rf build
+      mkdir build
+      cd build
+      cmake .. -DLAZBUILD_EXE=/usr/bin/lazbuild -DLCL_VERSION=10008
+      make
       make install
     build-packages:
       - gcc
@@ -49,38 +94,5 @@ parts:
       - pkg-config
       - cmake
       - gettext
-    stage-packages:
-      - libatk1.0-0
-      - libcairo2
-      - libdatrie1
-      - libfontconfig1
-      - libfreetype6
-      - libfribidi0
-      - libgdk-pixbuf2.0-0
-      - libgraphite2-3
-      - libgtk2.0-0
-      - libharfbuzz0b
-      - libpango-1.0-0
-      - libpangocairo-1.0-0
-      - libpangoft2-1.0-0
-      - libpixman-1-0
-      - libpng16-16
-      - libthai0
-      - libx11-6
-      - libxau6
-      - libxcb-render0
-      - libxcb-shm0
-      - libxcb1
-      - libxcomposite1
-      - libxcursor1
-      - libxdamage1
-      - libxdmcp6
-      - libxext6
-      - libxfixes3
-      - libxi6
-      - libxinerama1
-      - libxrandr2
-      - libxrender1
-      - locales
     organize:
       /usr/bin/easymp3gain-gtk: /usr/bin/easymp3gain-gtk
