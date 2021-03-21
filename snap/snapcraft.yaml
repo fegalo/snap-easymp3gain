@@ -1,14 +1,14 @@
 name: easymp3gain
 base: core20
-version: '0.1' # 0.5.1+svn137
+version: '0.5.1+svn137'
 summary: GUI for MP3Gain
 description: |
   Graphical User Interface (GUI) for MP3Gain, VorbisGain and AACGain (enables
   you to modify the loudness level of mp3,ogg,mp4 files) / Frontend for
   MP3Gain / Grafische Benutzeroberflaeche fuer MP3Gain, VorbisGain und AACGain
 
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+grade: stable
+confinement: strict
 
 apps:
   easymp3gain:
