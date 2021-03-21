@@ -23,6 +23,7 @@ apps:
       - mount-observe
       - removable-media
       - x11
+    desktop: usr/share/applications/easymp3gain-gnome.desktop
 
 plugs:
   gtk-2-engines:
@@ -77,10 +78,11 @@ parts:
     override-build: |
       rm -rf ./*
       cp -R ../src/* .
+      sed -i.bak -e 's|Icon=easymp3gain$|Icon=${SNAP}/usr/share/icons/hicolor/128x128/apps/easymp3gain.png|g' data/easymp3gain.desktop.in
       rm -rf build
       mkdir build
       cd build
-      cmake .. -DLAZBUILD_EXE=/usr/bin/lazbuild -DLCL_VERSION=10008
+      cmake .. -DLAZBUILD_EXE=/usr/bin/lazbuild -DLCL_VERSION=10008 -DCMAKE_INSTALL_PREFIX=../../install/usr
       make
       make install
     build-packages:
